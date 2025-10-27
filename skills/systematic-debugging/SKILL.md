@@ -278,13 +278,13 @@ If systematic investigation reveals issue is truly environmental, timing-depende
 ## Integration with Other Skills
 
 **This skill requires using:**
-- **root-cause-tracing** - REQUIRED when error is deep in call stack (see Phase 1, Step 5)
-- **test-driven-development** - REQUIRED for creating failing test case (see Phase 4, Step 1)
+- **superpowers:root-cause-tracing** - REQUIRED when error is deep in call stack (see Phase 1, Step 5)
+- **superpowers:test-driven-development** - REQUIRED for creating failing test case (see Phase 4, Step 1)
 
 **Complementary skills:**
-- **defense-in-depth** - Add validation at multiple layers after finding root cause
-- **condition-based-waiting** - Replace arbitrary timeouts identified in Phase 2
-- **verification-before-completion** - Verify fix worked before claiming success
+- **superpowers:defense-in-depth** - Add validation at multiple layers after finding root cause
+- **superpowers:condition-based-waiting** - Replace arbitrary timeouts identified in Phase 2
+- **superpowers:verification-before-completion** - Verify fix worked before claiming success
 
 ## Real-World Impact
 

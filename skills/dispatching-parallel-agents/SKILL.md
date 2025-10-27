@@ -63,13 +63,37 @@ Each agent gets:
 
 ### 3. Dispatch in Parallel
 
-```typescript
-// In Codex CLI / AI environment
-Task("Fix agent-tool-abort.test.ts failures")
-Task("Fix batch-completion-behavior.test.ts failures")
-Task("Fix tool-approval-race-conditions.test.ts failures")
-// All three run concurrently
+**REQUIRED SUB-SKILL:** Use superpowers:tmux-orchestration
+
+Use one tmux session per independent domain. Name sessions predictably and pipe logs so you can watch progress without attaching.
+
+```bash
+# Example: three independent investigations
+mkdir -p logs
+
+# Agent 1: abort logic tests
+SESSION=agent-abort-tests
+CMD="npm test -- agent-tool-abort.test.ts"   # or: codex --yolo "Fix agent-tool-abort.test.ts failures"
+tmux new-session -d -s "$SESSION" "$CMD"
+tmux pipe-pane -o -t "$SESSION" "ts | tee -a logs/${SESSION}.log"
+
+# Agent 2: batch completion behavior
+SESSION=agent-batch-completion
+CMD="npm test -- batch-completion-behavior.test.ts"
+tmux new-session -d -s "$SESSION" "$CMD"
+tmux pipe-pane -o -t "$SESSION" "ts | tee -a logs/${SESSION}.log"
+
+# Agent 3: race conditions
+SESSION=agent-race-conditions
+CMD="npm test -- tool-approval-race-conditions.test.ts"
+tmux new-session -d -s "$SESSION" "$CMD"
+tmux pipe-pane -o -t "$SESSION" "ts | tee -a logs/${SESSION}.log"
+
+# Observe all logs together
+tail -n 50 -F logs/*.log | sed -u 's/^/[log] /'
 ```
+
+Replace the `CMD` with whatever process best fits the agent: a focused test run, a reproduction script, or a separate Codex instance prompt. See superpowers:tmux-orchestration for details.
 
 ### 4. Review and Integrate
 

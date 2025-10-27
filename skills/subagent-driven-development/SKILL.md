@@ -23,7 +23,7 @@ Execute plan by dispatching fresh subagent per task, with code review after each
 - Want continuous progress with quality gates
 
 **When NOT to use:**
-- Need to review plan first (use executing-plans)
+- Need to review plan first (use superpowers:executing-plans)
 - Tasks are tightly coupled (manual execution better)
 - Plan needs revision (brainstorm first)
 
@@ -43,44 +43,37 @@ Tell Codex explicitly: "Create a plan with a checkbox for each task below, then 
 
 ### 2. Execute Task with Subagent
 
-For each task:
+For each task, spin a fresh worker using tmux (one session per task) so context and logs remain isolated.
 
-**Dispatch fresh subagent:**
-```
-Task tool (general-purpose):
-  description: "Implement Task N: [task name]"
-  prompt: |
-    You are implementing Task N from [plan-file].
+**REQUIRED SUB-SKILL:** Use superpowers:tmux-orchestration
 
-    Read that task carefully. Your job is to:
-    1. Implement exactly what the task specifies
-    2. Write tests (following TDD if task says to)
-    3. Verify implementation works
-    4. Commit your work
-    5. Report back
+```bash
+# Example: implement Task N using a dedicated session
+mkdir -p logs
+SESSION=task-N-implement
+CMD="bash -lc 'npm test && npm run impl-task-N'"   # or: codex --yolo "Implement Task N: [task name]"
+tmux new-session -d -s "$SESSION" "$CMD"
+tmux pipe-pane -o -t "$SESSION" "ts | tee -a logs/${SESSION}.log"
 
-    Work from: [directory]
-
-    Report: What you implemented, what you tested, test results, files changed, any issues
+# Send follow-ups to the running worker (if interactive)
+tmux send-keys -t "$SESSION" "Run the failing tests only" C-m
 ```
 
-**Subagent reports back** with summary of work.
+The worker (you or another Codex session) follows the task’s instructions, writes tests (TDD), implements the change, verifies, and reports back. Keep the session’s log as the subagent report.
 
 ### 3. Review Subagent's Work
 
-**Dispatch code-reviewer subagent:**
-```
-Task tool (superpowers:code-reviewer):
-  Use template at requesting-code-review/code-reviewer.md
+Run a review using the template in `skills/requesting-code-review/code-reviewer.md`. You can do this in the current session or launch a dedicated tmux session for an isolated reviewer (see superpowers:tmux-orchestration).
 
-  WHAT_WAS_IMPLEMENTED: [from subagent's report]
-  PLAN_OR_REQUIREMENTS: Task N from [plan-file]
-  BASE_SHA: [commit before task]
-  HEAD_SHA: [current commit]
-  DESCRIPTION: [task summary]
+```bash
+BASE_SHA=$(git rev-parse HEAD~1)   # or your baseline
+HEAD_SHA=$(git rev-parse HEAD)
+SESSION=review-task-N
+CMD="codex --yolo 'Use code-reviewer template with WHAT_WAS_IMPLEMENTED=[summary], PLAN_OR_REQUIREMENTS=Task N from [plan-file], BASE_SHA=$BASE_SHA, HEAD_SHA=$HEAD_SHA, DESCRIPTION=[summary]'"
+tmux new-session -d -s "$SESSION" "$CMD"; tmux pipe-pane -o -t "$SESSION" "ts | tee -a logs/${SESSION}.log"
 ```
 
-**Code reviewer returns:** Strengths, Issues (Critical/Important/Minor), Assessment
+Reviewer returns Strengths, Issues (Critical/Important/Minor), and an Assessment. Capture the output in the log and paste highlights back into the main plan.
 
 ### 4. Apply Review Feedback
 
@@ -89,10 +82,7 @@ Task tool (superpowers:code-reviewer):
 - Fix Important issues before next task
 - Note Minor issues
 
-**Dispatch follow-up subagent if needed:**
-```
-"Fix issues from code review: [list issues]"
-```
+**Dispatch follow-up subagent if needed:** create a new tmux session focused on fixing the specific issues found.
 
 ### 5. Mark Complete, Next Task
 
@@ -184,14 +174,15 @@ Done!
 ## Integration
 
 **Required workflow skills:**
-- **writing-plans** - REQUIRED: Creates the plan that this skill executes
-- **requesting-code-review** - REQUIRED: Review after each task (see Step 3)
-- **finishing-a-development-branch** - REQUIRED: Complete development after all tasks (see Step 7)
+- **superpowers:writing-plans** - REQUIRED: Creates the plan that this skill executes
+- **superpowers:requesting-code-review** - REQUIRED: Review after each task (see Step 3)
+- **superpowers:finishing-a-development-branch** - REQUIRED: Complete development after all tasks (see Step 7)
+- **superpowers:tmux-orchestration** - REQUIRED: One session per subagent and persistent logs
 
 **Subagents must use:**
-- **test-driven-development** - Subagents follow TDD for each task
+- **superpowers:test-driven-development** - Subagents follow TDD for each task
 
 **Alternative workflow:**
-- **executing-plans** - Use for parallel session instead of same-session execution
+- **superpowers:executing-plans** - Use for parallel session instead of same-session execution
 
-See code-reviewer template: requesting-code-review/code-reviewer.md
+See reviewer template in superpowers:requesting-code-review (file: requesting-code-review/code-reviewer.md)

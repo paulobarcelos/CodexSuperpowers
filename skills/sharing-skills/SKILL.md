@@ -191,4 +191,4 @@ Each skill should:
 
 ## Related Skills
 
-- **writing-skills** - REQUIRED: How to create well-tested skills before sharing
+- **superpowers:writing-skills** - REQUIRED: How to create well-tested skills before sharing
