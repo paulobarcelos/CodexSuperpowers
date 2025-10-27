@@ -1,0 +1,29 @@
+name: Bug Report
+description: Report a defect with clear reproduction steps
+title: "Bug: <short title>"
+labels: ["type:bug"]
+body:
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      description: OS, version, branch (or commit)
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Be precise; numbered list preferred
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Logs, screenshots, related issues/PRs
+

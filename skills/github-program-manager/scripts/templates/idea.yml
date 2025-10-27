@@ -1,0 +1,33 @@
+name: Idea
+description: Capture an idea or research topic
+title: "Idea: <short title>"
+labels: ["type:idea", "priority:medium"]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Background, user/problem, links
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What hurts? Who cares?
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Direction
+      description: Sketch the approach; alternatives welcome
+  - type: input
+    id: value
+    attributes:
+      label: Expected Value
+      description: Outcome, metrics, or hypothesis
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: [High, Medium, Low]
+    validations:
+      required: false
+

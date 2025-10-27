@@ -1,0 +1,28 @@
+This project is an independent fork of the "Superpowers" skills library.
+
+Upstream project: obra/superpowers (MIT License)
+Original author: Jesse Vincent and contributors
+
+Fork name: Codex Superpowers (working title)
+Fork steward: Paulo Barcelos (paulobarcelos.com)
+Purpose: Adapt the skills content and workflows for Codex CLI (GPT‑5),
+         replacing Claude-specific tools and plugin semantics with a
+         lightweight, manual activation workflow driven by AGENTS.md.
+
+Attribution and license
+- The upstream project is licensed under the MIT License. This fork
+  retains the original MIT license and copyright notice.
+- Additional changes in this fork are © Paulo Barcelos and The Codex Superpowers Contributors
+  and are also released under the MIT License.
+
+Affiliations
+- This fork is not affiliated with Anthropic, OpenAI, or the upstream
+  maintainers. Brand names are used only to describe compatibility.
+
+Summary of material changes (high level)
+- Replace CLAUDE.md conventions with AGENTS.md planning rules
+- Remove references to Claude plugins/Skill tool; document manual loading
+- Introduce Codex-oriented plan enforcement and prompting guidance
+- Update examples, paths, and docs to reflect Codex CLI workflows
+
+For detailed differences, see FORK-INFO.md.

@@ -1,0 +1,26 @@
+name: Decision (ADR)
+description: Architecture Decision Record
+title: "ADR: <short decision>"
+labels: ["type:decision", "priority:medium"]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why a decision is needed; constraints; stakeholders
+  - type: textarea
+    id: options
+    attributes:
+      label: Options Considered
+      description: Enumerate options with pros/cons
+  - type: textarea
+    id: decision
+    attributes:
+      label: Decision
+      description: What we chose and why
+  - type: textarea
+    id: consequences
+    attributes:
+      label: Consequences
+      description: Positive/negative follow-ups and tasks
+
