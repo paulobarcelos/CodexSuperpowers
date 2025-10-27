@@ -10,6 +10,7 @@ set -euo pipefail
 OWNER=${OWNER:-}
 REPO=${REPO:-}
 PROJECT_NAME=${PROJECT_NAME:-}
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [[ -z "${OWNER}" || -z "${REPO}" ]]; then
   echo "Set OWNER and REPO env vars" >&2
@@ -32,11 +33,11 @@ echo "==> Enable Wiki (idempotent)"
 gh repo edit "$OWNER/$REPO" --enable-wiki >/dev/null || true
 
 echo "==> Ensure Wiki Journal.md and Decisions.md exist"
-OWNER="$OWNER" REPO="$REPO" bash "${OLDPWD}/skills/github-program-manager/scripts/wiki-ensure-pages.sh"
+OWNER="$OWNER" REPO="$REPO" bash "$SCRIPT_DIR/wiki-ensure-pages.sh"
 
 echo "==> Enable Discussions (Ideas only)"
 gh repo edit "$OWNER/$REPO" --enable-discussions >/dev/null || true
-OWNER="$OWNER" REPO="$REPO" bash "${OLDPWD}/skills/github-program-manager/scripts/ensure-discussion-categories.sh"
+OWNER="$OWNER" REPO="$REPO" bash "$SCRIPT_DIR/ensure-discussion-categories.sh"
 
 echo "==> Seed labels"
 for row in \

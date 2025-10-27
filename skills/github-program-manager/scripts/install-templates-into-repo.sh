@@ -8,6 +8,7 @@ set -euo pipefail
 
 OWNER=${OWNER:-}
 REPO=${REPO:-}
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [[ -z "$OWNER" || -z "$REPO" ]]; then
   echo "Set OWNER and REPO env vars" >&2
@@ -27,8 +28,8 @@ git checkout -b chore/pm-templates
 mkdir -p .github/ISSUE_TEMPLATE .github/workflows
 
 echo "==> Copying templates (bug, idea)"
-cp -f "${OLDPWD}/skills/github-program-manager/scripts/templates/bug.yml" .github/ISSUE_TEMPLATE/
-cp -f "${OLDPWD}/skills/github-program-manager/scripts/templates/idea.yml" .github/ISSUE_TEMPLATE/
+cp -f "$SCRIPT_DIR/templates/bug.yml" .github/ISSUE_TEMPLATE/
+cp -f "$SCRIPT_DIR/templates/idea.yml" .github/ISSUE_TEMPLATE/
 
 # No policy workflows; we prefer guidance over strict enforcement
 

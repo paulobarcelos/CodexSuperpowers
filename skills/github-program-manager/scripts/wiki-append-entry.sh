@@ -36,9 +36,21 @@ DATE=$(date +%F)
 
 gh repo edit "$OWNER/$REPO" --enable-wiki >/dev/null || true
 
+HAS_WIKI=$(gh api "repos/$OWNER/$REPO" --jq '.has_wiki' 2>/dev/null || echo "false")
+if [[ "$HAS_WIKI" != "true" ]]; then
+  echo "Wiki is not enabled for $OWNER/$REPO (has_wiki=$HAS_WIKI). Run wiki-ensure-pages.sh after enabling." >&2
+  exit 1
+fi
+
+TOKEN=$(gh auth token 2>/dev/null || true)
+if [[ -z "$TOKEN" ]]; then
+  echo "gh auth token unavailable; run 'gh auth login' with repo scope." >&2
+  exit 1
+}
+
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
-git clone "https://github.com/$OWNER/$REPO.wiki.git" "$tmp/wiki" -q
+GIT_TERMINAL_PROMPT=0 git clone "https://x-access-token:${TOKEN}@github.com/$OWNER/$REPO.wiki.git" "$tmp/wiki" -q
 cd "$tmp/wiki"
 
 file="$PAGE.md"
@@ -63,4 +75,3 @@ git commit -m "wiki(${PAGE}): append entry — ${DATE} ${TITLE}" >/dev/null
 git push -u origin HEAD >/dev/null
 
 echo "Appended entry to $OWNER/$REPO wiki page $PAGE"
-
