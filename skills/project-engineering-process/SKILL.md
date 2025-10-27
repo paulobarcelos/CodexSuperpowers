@@ -1,12 +1,13 @@
 ---
 name: project-engineering-process
-description: Use when coordinating day-to-day work on Runway Compass — defines source-of-truth, branch naming, CI expectations, and how to journal/record decisions (GitHub Discussions) while keeping Issues for executable work and Projects for status.
+description: Use when coordinating day-to-day work on Runway Compass — defines source-of-truth, branch naming, CI expectations, and how to journal/record decisions in the GitHub Wiki (single Journal page and single Decisions page). Keep Discussions only for Ideas. Issues for executable work; Projects for status.
 ---
 
 # Project Engineering Process (Runway Compass)
 
 ## Source of Truth
-- Discussions → Journal, Decision Log, Ideas (categories)
+- Wiki → Journal (single page), Decisions (single page)
+- Discussions → Ideas (category)
 - Issues → Executable work with acceptance criteria
 - PRs → Code changes linked to Issues
 - Projects v2 → Planning and status (Backlog/Now/Next/Done)
@@ -22,9 +23,9 @@ description: Use when coordinating day-to-day work on Runway Compass — defines
 - Treat Vercel preview as deployability check; Actions as regression guard
 
 ## Journaling & Decisions
-- Journal: append status/insights to a single Discussion per effort (daily or per feature)
-- Decisions: one Discussion per irreversible decision; keep concise and evergreen
-- Avoid ad‑hoc `.md` notes for journal/decisions in the repo; link Discussions from PRs/Issues when relevant
+- Journal: append entries to Wiki page `Journal` (timestamped blocks)
+- Decisions: append entries to Wiki page `Decisions` (ADR-style blocks)
+- Avoid ad‑hoc `.md` notes scattered in the repo; link Wiki anchors from PRs/Issues when relevant
 
 ## Working Agreement
 1. Ensure an Issue exists for the task (create if missing)
@@ -33,6 +34,5 @@ description: Use when coordinating day-to-day work on Runway Compass — defines
 4. On completion: tests green → PR → merge → close Issue
 
 ## Tools
-- `gh` CLI for Issues/PRs/Projects/Discussions
-- Pair with superpowers:github-program-manager (templates and scripts) and superpowers:tmux-orchestration for parallel agents
-
+- `gh` CLI for Issues/PRs/Projects/Discussions/Wiki
+- Pair with superpowers:github-program-manager (now Wiki-first) and superpowers:tmux-orchestration for parallel agents

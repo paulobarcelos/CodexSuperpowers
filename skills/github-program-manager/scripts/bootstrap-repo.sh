@@ -28,9 +28,15 @@ else
   gh repo create "$OWNER/$REPO" --private --confirm
 fi
 
-echo "==> Enable Discussions"
-gh api repos/:owner/:repo -X PATCH -F owner="$OWNER" -F repo="$REPO" -f has_discussions=true >/dev/null
-echo "(Add categories in the UI to match your workflow: Journal, Ideas, Decisions)"
+echo "==> Enable Wiki (idempotent)"
+gh repo edit "$OWNER/$REPO" --enable-wiki >/dev/null || true
+
+echo "==> Ensure Wiki Journal.md and Decisions.md exist"
+OWNER="$OWNER" REPO="$REPO" bash "${OLDPWD}/skills/github-program-manager/scripts/wiki-ensure-pages.sh"
+
+echo "==> Enable Discussions (Ideas only)"
+gh repo edit "$OWNER/$REPO" --enable-discussions >/dev/null || true
+OWNER="$OWNER" REPO="$REPO" bash "${OLDPWD}/skills/github-program-manager/scripts/ensure-discussion-categories.sh"
 
 echo "==> Seed labels"
 for row in \
@@ -39,8 +45,7 @@ for row in \
   "priority:low 0E8A16 Lowest priority" \
   "type:bug D73A4A Bug" \
   "type:feature 1D76DB Feature" \
-  "type:journal 5319E7 Journal entry" \
-  "type:decision 006B75 Decision/ADR" \
+  "type:idea 0052CC Idea" \
   "type:task C2E0C6 Task"; do
   IFS=' ' read -r name color desc <<<"$row"
   gh label create "$name" -R "$OWNER/$REPO" --color "$color" -d "$desc" 2>/dev/null || true
@@ -75,4 +80,3 @@ cat <<EOF
 - Add Issue templates to .github/ISSUE_TEMPLATE/ in $OWNER/$REPO (samples in skills/github-program-manager/scripts/templates)
 - Create a saved Project (v2) view filtered to "repo:${OWNER}/${REPO}" (via UI)
 EOF
-

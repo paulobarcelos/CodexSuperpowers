@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Ensure GitHub Discussions categories exist: Journal, Decision Log, Ideas
+# Ensure GitHub Discussions categories exist: Ideas (only)
 # Requires: gh auth login (repo admin), jq
 
 OWNER=${OWNER:-}
@@ -14,7 +14,7 @@ fi
 
 repoId=$(gh api graphql -f query='query($o:String!,$r:String!){repository(owner:$o,name:$r){id}}' -f o="$OWNER" -f r="$REPO" --jq .data.repository.id)
 
-want=("Journal" "Decision Log" "Ideas")
+want=("Ideas")
 
 existing=$(gh api graphql -f query='query($o:String!,$r:String!){repository(owner:$o,name:$r){discussionCategories(first:50){nodes{name}}}}' -f o="$OWNER" -f r="$REPO" --jq '.data.repository.discussionCategories.nodes[].name')
 
@@ -33,4 +33,3 @@ for n in "${want[@]}"; do
 done
 
 echo "Done."
-

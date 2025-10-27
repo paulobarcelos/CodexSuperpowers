@@ -26,18 +26,17 @@ pushd "$TMPDIR/$REPO" >/dev/null
 git checkout -b chore/pm-templates
 mkdir -p .github/ISSUE_TEMPLATE .github/workflows
 
-echo "==> Copying templates"
-cp -f "${OLDPWD}/skills/github-program-manager/scripts/templates/journal.yml" .github/ISSUE_TEMPLATE/
+echo "==> Copying templates (bug, idea)"
+cp -f "${OLDPWD}/skills/github-program-manager/scripts/templates/bug.yml" .github/ISSUE_TEMPLATE/
 cp -f "${OLDPWD}/skills/github-program-manager/scripts/templates/idea.yml" .github/ISSUE_TEMPLATE/
-cp -f "${OLDPWD}/skills/github-program-manager/scripts/templates/decision.yml" .github/ISSUE_TEMPLATE/
 
 # No policy workflows; we prefer guidance over strict enforcement
 
 git add .github
-git commit -m "chore(pm): add issue templates (journal, idea, decision)"
+git commit -m "chore(pm): add issue templates (bug, idea)"
 git push -u origin HEAD
 
 echo "==> Opening PR"
-gh pr create --title "chore(pm): add PM templates" --body "Adds repo-local PM templates (journal, idea, decision)."
+gh pr create --title "chore(pm): add PM templates" --body "Adds repo-local PM templates (bug, idea)."
 
 echo "==> Done. Review and merge the PR in $OWNER/$REPO."
