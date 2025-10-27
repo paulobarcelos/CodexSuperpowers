@@ -52,21 +52,16 @@ for row in \
   gh label create "$name" -R "$OWNER/$REPO" --color "$color" -d "$desc" 2>/dev/null || true
 done
 
-echo "==> (Optional) Add branch protections on main — edit as needed"
-gh api repos/:owner/:repo/branches/main/protection -X PUT \
-  -F owner="$OWNER" -F repo="$REPO" \
-  -H "Accept: application/vnd.github+json" \
-  -f required_status_checks='{"strict":true,"contexts":[]}' \
-  -f enforce_admins=true \
-  -f required_pull_request_reviews='{"required_approving_review_count":1}' \
-  -f restrictions='null' >/dev/null || true
+echo "==> (Optional) Add branch protections on main — skipped (configure manually if desired)"
 
 echo "==> Ensure user/org Project (v2): $PROJECT_NAME"
-OWNER_KIND="--owner $OWNER"
-PROJ_NUM=$(gh project list $OWNER_KIND --format json | jq -r ".[] | select(.title==\"$PROJECT_NAME\") | .number" | head -n1)
+OWNER_KIND=(--owner "$OWNER")
+PROJECT_JSON=$(gh project list "${OWNER_KIND[@]}" --format json)
+PROJ_NUM=$(echo "$PROJECT_JSON" | jq -r ".projects[]? | select(.title==\"$PROJECT_NAME\") | .number" | head -n1)
 if [[ -z "$PROJ_NUM" || "$PROJ_NUM" == null ]]; then
   gh project create "$PROJECT_NAME" --owner "$OWNER" >/dev/null
-  PROJ_NUM=$(gh project list $OWNER_KIND --format json | jq -r ".[] | select(.title==\"$PROJECT_NAME\") | .number" | head -n1)
+  PROJECT_JSON=$(gh project list "${OWNER_KIND[@]}" --format json)
+  PROJ_NUM=$(echo "$PROJECT_JSON" | jq -r ".projects[]? | select(.title==\"$PROJECT_NAME\") | .number" | head -n1)
 fi
 
 echo "==> Ensure standard fields on Project $PROJ_NUM"

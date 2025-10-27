@@ -46,7 +46,7 @@ TOKEN=$(gh auth token 2>/dev/null || true)
 if [[ -z "$TOKEN" ]]; then
   echo "gh auth token unavailable; run 'gh auth login' with repo scope." >&2
   exit 1
-}
+fi
 
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT

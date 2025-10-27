@@ -65,15 +65,20 @@ OWNER="$OWNER" REPO="$REPO" PAGE=Journal TITLE="Sandbox setup" BODY="Initial wir
 OWNER="$OWNER" REPO="$REPO" PAGE=Decisions TITLE="ADR: Use Wiki for journal/decisions" BODY="Centralize knowledge in Wiki; use Discussions for ideas only." \
   bash "$(dirname "$0")/wiki-append-entry.sh" >/dev/null
 
-# Discussion: Idea
+# Discussion: Idea (optional)
 IDEA_URL=$(gh discussion create -R "$OWNER/$REPO" --category "Ideas" --title "Idea: CLI-only workflow" --body "Short context" --json url --jq .url 2>/dev/null || echo "")
+
+if [[ -n "$IDEA_URL" ]]; then
+  echo "Created Idea discussion: $IDEA_URL"
+else
+  echo "WARN: Unable to create Idea discussion via CLI (maybe missing permission?)."
+fi
 
 echo "==> Results"
 echo "ISSUE_URL=$ISSUE_URL"
 echo "PR_URL=$PR_URL"
 echo "IDEA_URL=$IDEA_URL"
 echo "ITEM_ID=$ITEM_ID"
-echo "ITEM2_ID=$ITEM2_ID"
 echo "PROJ_ID=$PROJ_ID"
 echo "PROJ_NUM=$PROJ_NUM"
 
