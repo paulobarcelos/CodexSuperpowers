@@ -43,17 +43,19 @@ Tell Codex explicitly: "Create a plan with a checkbox for each task below, then 
 
 ### 2. Execute Task with Subagent
 
-For each task, spin a fresh worker using tmux (one session per task) so context and logs remain isolated.
+For each task, spin a fresh worker using tmux (one session per task) so context and logs remain isolated. Run the Quick Start block in superpowers:tmux-orchestration once per repository to initialize `.tmux-logs/` and ignore rules before dispatching the first subagent.
 
 **REQUIRED SUB-SKILL:** Use superpowers:tmux-orchestration
 
 ```bash
 # Example: implement Task N using a dedicated session
-mkdir -p logs
+mkdir -p .tmux-logs
+touch .tmux-logs/.gitkeep
 SESSION=task-N-implement
-CMD="bash -lc 'npm test && npm run impl-task-N'"   # or: codex --yolo "Implement Task N: [task name]"
-tmux new-session -d -s "$SESSION" "$CMD"
-tmux pipe-pane -o -t "$SESSION" "ts | tee -a logs/${SESSION}.log"
+CMD="codex --yolo 'Implement Task N: <task name>'"
+tmux new-session -d -s "$SESSION"
+tmux send-keys -t "$SESSION" "$CMD" C-m
+tmux pipe-pane -o -t "$SESSION" "ts | tee -a .tmux-logs/${SESSION}.log"
 
 # Send follow-ups to the running worker (if interactive)
 tmux send-keys -t "$SESSION" "Run the failing tests only" C-m
@@ -69,8 +71,10 @@ Run a review using the template in `skills/requesting-code-review/code-reviewer.
 BASE_SHA=$(git rev-parse HEAD~1)   # or your baseline
 HEAD_SHA=$(git rev-parse HEAD)
 SESSION=review-task-N
-CMD="codex --yolo 'Use code-reviewer template with WHAT_WAS_IMPLEMENTED=[summary], PLAN_OR_REQUIREMENTS=Task N from [plan-file], BASE_SHA=$BASE_SHA, HEAD_SHA=$HEAD_SHA, DESCRIPTION=[summary]'"
-tmux new-session -d -s "$SESSION" "$CMD"; tmux pipe-pane -o -t "$SESSION" "ts | tee -a logs/${SESSION}.log"
+REVIEW_CMD="codex --yolo 'Use code-reviewer template with WHAT_WAS_IMPLEMENTED=[summary], PLAN_OR_REQUIREMENTS=Task N from [plan-file], BASE_SHA=$BASE_SHA, HEAD_SHA=$HEAD_SHA, DESCRIPTION=[summary]'"
+tmux new-session -d -s "$SESSION"
+tmux send-keys -t "$SESSION" "$REVIEW_CMD" C-m
+tmux pipe-pane -o -t "$SESSION" "ts | tee -a .tmux-logs/${SESSION}.log"
 ```
 
 Reviewer returns Strengths, Issues (Critical/Important/Minor), and an Assessment. Capture the output in the log and paste highlights back into the main plan.
