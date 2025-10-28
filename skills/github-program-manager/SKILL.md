@@ -28,9 +28,9 @@ Run project management entirely in GitHub using `gh` and the API. Source of trut
 
 ## Quick Reference
 - Wiki enable: `gh repo edit <owner>/<repo> --enable-wiki`
-- Seed Wiki pages: `OWNER=<o> REPO=<r> bash skills/github-program-manager/scripts/wiki-ensure-pages.sh`
-- Wiki append (Journal): `OWNER=<o> REPO=<r> PAGE=Journal TITLE="<topic>" BODY_FILE=<file> bash skills/github-program-manager/scripts/wiki-append-entry.sh`
-- Wiki append (Decision): `OWNER=<o> REPO=<r> PAGE=Decisions TITLE="ADR: <short>" BODY_FILE=<file> bash skills/github-program-manager/scripts/wiki-append-entry.sh`
+- Seed Wiki pages: `OWNER=<o> REPO=<r> bash scripts/wiki-ensure-pages.sh`
+- Wiki append (Journal): `OWNER=<o> REPO=<r> PAGE=Journal TITLE="<topic>" BODY_FILE=<file> bash scripts/wiki-append-entry.sh`
+- Wiki append (Decision): `OWNER=<o> REPO=<r> PAGE=Decisions TITLE="ADR: <short>" BODY_FILE=<file> bash scripts/wiki-append-entry.sh`
 - Discussion (Idea): `gh discussion create -R <owner>/<repo> --category "Ideas" --title "<title>" --body-file -`
 - Issue (work item): `gh issue create -R <owner>/<repo> -F .github/ISSUE_TEMPLATE/<form>.yml`
 - Add Issue to Project: `gh project item-add --owner <user|org> --number <proj> --url $(gh issue view <n> -R <owner>/<repo> --json url -q .url)`
@@ -43,11 +43,11 @@ Run project management entirely in GitHub using `gh` and the API. Source of trut
 - Token can manage Wiki/Discussions/Issues/PRs/Projects/Repo settings.
 
 ## Subagent Test Protocol
-1) Ensure board + fields: `OWNER=<owner> TITLE="Repo: <owner>/<repo>" bash skills/github-program-manager/ensure-project-graphql.sh`
-2) Enable Wiki and seed pages: `OWNER=<owner> REPO=<repo> bash skills/github-program-manager/scripts/wiki-ensure-pages.sh`
+1) Ensure board + fields: `OWNER=<owner> TITLE="Repo: <owner>/<repo>" bash ensure-project-graphql.sh`
+2) Enable Wiki and seed pages: `OWNER=<owner> REPO=<repo> bash scripts/wiki-ensure-pages.sh`
 3) Append Journal and Decision sample entries via `wiki-append-entry.sh`.
-4) Ensure Discussions has an Ideas category only: `OWNER=<owner> REPO=<repo> bash skills/github-program-manager/scripts/ensure-discussion-categories.sh`
-5) Issue → add to Project → Status="In Progress" using `skills/github-program-manager/scripts/project-status.sh`.
+4) Ensure Discussions has an Ideas category only: `OWNER=<owner> REPO=<repo> bash scripts/ensure-discussion-categories.sh`
+5) Issue → add to Project → Status="In Progress" using `scripts/project-status.sh`.
 6) Draft PR with “Closes #<id>”; optionally merge and set Status="Done".
 
 ## Acceptance Criteria
@@ -55,12 +55,12 @@ Run project management entirely in GitHub using `gh` and the API. Source of trut
 - Artifacts linked; status derives from evidence.
 - No ad‑hoc notes in the repo tree.
 
-## Helpers (this repo)
-- skills/github-program-manager/scripts/ensure-project-graphql.sh
-- skills/github-program-manager/scripts/ensure-discussion-categories.sh (Ideas only)
-- skills/github-program-manager/scripts/wiki-ensure-pages.sh (create/seed Journal.md and Decisions.md)
-- skills/github-program-manager/scripts/wiki-append-entry.sh (append timestamped entries)
-- skills/github-program-manager/scripts/project-status.sh
-- skills/github-program-manager/scripts/bootstrap-repo.sh (optional)
-- skills/github-program-manager/scripts/install-templates-into-repo.sh (bug/idea templates only)
-- skills/github-program-manager/scripts/test-run.sh (sandbox verification)
+## Helpers
+- scripts/ensure-project-graphql.sh
+- scripts/ensure-discussion-categories.sh (Ideas only)
+- scripts/wiki-ensure-pages.sh (create/seed Journal.md and Decisions.md)
+- scripts/wiki-append-entry.sh (append timestamped entries)
+- scripts/project-status.sh
+- scripts/bootstrap-repo.sh (optional)
+- scripts/install-templates-into-repo.sh (bug/idea templates only)
+- scripts/test-run.sh (sandbox verification)

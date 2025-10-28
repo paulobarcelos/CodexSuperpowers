@@ -3,7 +3,7 @@ name: project-engineering-process
 description: Use when coordinating day-to-day work on Runway Compass — defines source-of-truth, branch naming, CI expectations, and how to journal/record decisions in the GitHub Wiki (single Journal page and single Decisions page). Keep Discussions only for Ideas. Issues for executable work; Projects for status.
 ---
 
-# Project Engineering Process (Runway Compass)
+# Project Engineering Process
 
 ## Source of Truth
 - Wiki → Journal (single page), Decisions (single page)

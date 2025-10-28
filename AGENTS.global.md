@@ -14,8 +14,8 @@ You are **Codex** running without plugins. This directive defines how you discov
 
 ## §1 Locations (search both; project wins)
 
-- Global: `~/superpowers/skills/`
-- Project: `./skills/` (repo root) If the same skill exists in both, **use the project copy**.
+- Global: `'~/.codex/skills'`, `~/superpowers/skills/`,`/Lab/Agents/superpowers/skills`
+- Project: `./skills/` (project root) If the same skill exists in both, **use the project copy**.
 
 ## §2 Skill Structure (contract)
 
@@ -32,13 +32,70 @@ A **skill** is a directory containing `SKILL.md`:
 At session start, index front matter (name/description/keys) from **both** locations:
 
 ```bash
-for f in ~/superpowers/skills/*/SKILL.md ./skills/*/SKILL.md; do \
-  [ -f "$f" ] || continue; echo "# $f"; \
-  awk 'BEGIN{fm=0} /^---[[:space:]]*$/ {fm++; next} fm==1 {print}' "$f"; \
-done 2>/dev/null
+python3 - <<'PY'
+import glob, os
+cwd = os.getcwd()
+candidates = [
+    ('project', os.path.join(cwd, 'skills'), 0),
+    ('global', os.path.expanduser('~/Lab/Agents/superpowers/skills'), 1),
+    ('global', os.path.expanduser('~/superpowers/skills'), 1),
+    ('global', os.path.expanduser('~/.codex/skills'), 1),
+]
+records = {}
+
+for scope, directory, priority in candidates:
+    if not os.path.isdir(directory):
+        continue
+    for path in glob.glob(os.path.join(directory, '*/SKILL.md')):
+        try:
+            with open(path, 'r', encoding='utf-8') as handle:
+                text = handle.read()
+        except OSError:
+            continue
+        if not text.startswith('---'):
+            continue
+        parts = text.split('---', 2)
+        if len(parts) < 3:
+            continue
+        front = parts[1]
+        name = ''
+        desc = ''
+        for line in front.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith('name:') and not name:
+                name = line[5:].strip()
+            elif line.startswith('description:') and not desc:
+                desc = line[12:].strip()
+        if not name:
+            continue
+        current = records.get(name)
+        if current and priority >= current['priority']:
+            continue
+        records[name] = {
+            'priority': priority,
+            'scope': scope,
+            'path': path,
+            'description': desc,
+        }
+
+if not records:
+    raise SystemExit('No skills found')
+
+name_width = max(len(name) for name in records)
+
+for name in sorted(records):
+    entry = records[name]
+    desc = entry['description'] or '-'
+    rel_path = entry['path']
+    if rel_path.startswith(cwd):
+        rel_path = '.' + rel_path[len(cwd):]
+    print(f"{name.ljust(name_width)} | {entry['scope']:<7} | {rel_path} | {desc}")
+PY
 ```
 
-Persist a lightweight map `{name → path, description, extras…}`. **Do not** read bodies yet.
+The script emits a single, sorted line per skill (preferring project copies when duplicates exist) so the catalog stays compact. Persist a lightweight map `{name → path, description, extras…}` from that output. **Do not** read bodies yet.
 
 ## §4 Selection Algorithm (when to use a skill)
 
@@ -54,14 +111,16 @@ Given the current task:
 
 ## §5 Load On Demand (project copy preferred)
 
-Before acting, read the full `SKILL.md`:
+Before acting, read the full `SKILL.md`, example:
 
 ```bash
-if [ -f ./skills/<skill>/SKILL.md ]; then
-  cat ./skills/<skill>/SKILL.md
-else
-  cat ~/superpowers/skills/<skill>/SKILL.md
-fi
+cat ./skills/<skill>/SKILL.md
+## or
+cat ~/Lab/Agents/superpowers/skills/<skill>/SKILL.md
+## or
+cat ~/superpowers/skills/<skill>/SKILL.md
+## or
+cat ~/.codex/skills/<skill>/SKILL.md
 ```
 
 Then immediately:
