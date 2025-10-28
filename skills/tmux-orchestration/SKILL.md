@@ -13,14 +13,21 @@ Coordinate parallel agents and long-running commands with tmux. Name sessions pr
 ```bash
 # 1) Create hidden logs dir (ensure .tmux-logs/ is gitignored)
 mkdir -p .tmux-logs
-grep -q '^\\.tmux-logs/$' .gitignore || {
-  echo '.tmux-logs/' >> .gitignore
-  echo 'Added .tmux-logs/ to .gitignore (commit this change).'
-}
+touch .tmux-logs/.gitkeep
+touch .gitignore
+if ! grep -q '^\\.tmux-logs/\\*$' .gitignore; then
+  {
+    echo '.tmux-logs/*'
+    echo '!.tmux-logs/.gitkeep'
+  } >> .gitignore
+  echo 'Added .tmux-logs ignore rules (commit this change).'
+fi
 
 # 2) Launch a named session (agent-budgets) with durable logging
 SESSION=agent-budgets
-tmux new-session -d -s "$SESSION" "${CMD:-echo 'set CMD to run'}"
+tmux new-session -d -s "$SESSION"
+tmux send-keys -t "$SESSION" "${CMD:-echo 'set CMD to run'}"
+tmux send-keys -t "$SESSION" Enter
 
 # 3) Pipe pane to timestamped file (survives scroll) and console
 tmux pipe-pane -o -t "$SESSION" "ts | tee -a .tmux-logs/${SESSION}.log"   # requires 'moreutils' for ts; alternatively: awk '{print strftime("[%Y-%m-%d %H:%M:%S] ") $0}'

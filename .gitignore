@@ -2,4 +2,5 @@
 .worktrees/
 .private-journal/
 
-.tmux-logs/
+.tmux-logs/*
+!.tmux-logs/.gitkeep
