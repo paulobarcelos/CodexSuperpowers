@@ -11,18 +11,22 @@ Coordinate parallel agents and long-running commands with tmux. Name sessions pr
 ## Quick Start (Copy/Paste)
 
 ```bash
-# 1) Create logs dir
-mkdir -p logs
+# 1) Create hidden logs dir (ensure .tmux-logs/ is gitignored)
+mkdir -p .tmux-logs
+grep -q '^\\.tmux-logs/$' .gitignore || {
+  echo '.tmux-logs/' >> .gitignore
+  echo 'Added .tmux-logs/ to .gitignore (commit this change).'
+}
 
 # 2) Launch a named session (agent-budgets) with durable logging
 SESSION=agent-budgets
 tmux new-session -d -s "$SESSION" "${CMD:-echo 'set CMD to run'}"
 
 # 3) Pipe pane to timestamped file (survives scroll) and console
-tmux pipe-pane -o -t "$SESSION" "ts | tee -a logs/${SESSION}.log"   # requires 'moreutils' for ts; alternatively: awk '{print strftime("[%Y-%m-%d %H:%M:%S] ") $0}'
+tmux pipe-pane -o -t "$SESSION" "ts | tee -a .tmux-logs/${SESSION}.log"   # requires 'moreutils' for ts; alternatively: awk '{print strftime("[%Y-%m-%d %H:%M:%S] ") $0}'
 
 # 4) Watch all agents in one terminal (non-blocking)
-tail -n 50 -F logs/*.log | sed -u 's/^/[log] /'
+tail -n 50 -F .tmux-logs/*.log | sed -u 's/^/[log] /'
 
 # 5) Stop an agent
 tmux kill-session -t "$SESSION"
@@ -31,7 +35,7 @@ tmux kill-session -t "$SESSION"
 ## Recommended Conventions
 - Session name: `<area>-<task>` (e.g., `agent-repair`, `agent-tests`)
 - One process per session; prefer logging over capture-pane for progress
-- Always `pipe-pane` to `logs/<session>.log` with timestamps
+- Always `pipe-pane` to `.tmux-logs/<session>.log` with timestamps
 - Set `remain-on-exit` so failures leave evidence: `tmux set-option -t <session> remain-on-exit on`
 
 ## Launching Subagents
@@ -40,8 +44,14 @@ tmux kill-session -t "$SESSION"
 # Example: launch a Codex subagent working a specific plan task
 SESSION=agent-grid
 PROMPT="Execute Task 3 from docs/plans/2025-10-26-grid.md"
-tmux new-session -d -s "$SESSION" "codex --yolo \"$PROMPT\" 2>&1"
-tmux pipe-pane -o -t "$SESSION" "ts | tee -a logs/${SESSION}.log"
+tmux new-session -d -s "$SESSION"
+tmux send-keys -t "$SESSION" "cd /path/to/location"
+tmux send-keys -t "$SESSION" Enter
+tmux send-keys -t "$SESSION" "codex --yolo"
+tmux send-keys -t "$SESSION" Enter
+tmux send-keys -t "$SESSION" "'$PROMPT'"
+tmux send-keys -t "$SESSION" C-m
+tmux pipe-pane -o -t "$SESSION" "ts | tee -a .tmux-logs/${SESSION}.log"
 ```
 
 ### Send follow-ups (canonical two commands)
@@ -53,7 +63,7 @@ tmux send-keys -t "$SESSION" C-m
 ## Optional: Lightweight Dashboards
 To watch all agents at once without panes:
 ```bash
-tail -n 50 -F logs/*.log | sed -u 's/^/[log] /'
+tail -n 50 -F .tmux-logs/*.log | sed -u 's/^/[log] /'
 ```
 
 ## Why pipe-pane over capture-pane?
@@ -64,7 +74,7 @@ tail -n 50 -F logs/*.log | sed -u 's/^/[log] /'
 ## Common Tasks
 - List sessions: `tmux ls`
 - Attach (read-only): `tmux attach -t <session>`
-- Tail a specific agent: `tail -n 100 -F logs/<session>.log`
+- Tail a specific agent: `tail -n 100 -F .tmux-logs/<session>.log`
 - Kill: `tmux kill-session -t <session>`
 
 ## Mistakes to Avoid
@@ -72,6 +82,7 @@ tail -n 50 -F logs/*.log | sed -u 's/^/[log] /'
 - Unnamed sessions (hard to route logs)
 - No timestamps (impossible to correlate events)
 - Logs not persisted (lose evidence after detach)
+- `.tmux-logs/` missing from `.gitignore` (risk leaking logs into commits)
 
 ## Integration
 - Works with superpowers:subagent-driven-development (one session per subagent)
