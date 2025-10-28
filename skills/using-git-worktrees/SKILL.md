@@ -21,11 +21,13 @@ Follow this priority order:
 
 ```bash
 # Check in priority order
-ls -d .worktrees 2>/dev/null     # Preferred (hidden)
-ls -d worktrees 2>/dev/null      # Alternative
+ls -d .worktrees 2>/dev/null                   # Preferred (hidden)
+ls -d worktrees 2>/dev/null                    # Alternative
+ls -d ../<project-name>.worktrees 2>/dev/null  # External
 ```
+Infer project name, or ask human partner if needed.
 
-**If found:** Use that directory. If both exist, `.worktrees` wins.
+**If found:** Use that directory. If both exist, first ones take priority.
 
 ### 2. Check AGENTS.md
 
@@ -43,7 +45,8 @@ If no directory exists and no AGENTS.md preference:
 No worktree directory found. Where should I create worktrees?
 
 1. .worktrees/ (project-local, hidden)
-2. ~/.config/superpowers/worktrees/<project-name>/ (global location)
+2. worktrees/ (project-local)
+3. ../<project-name>.worktrees/ (external)
 
 Which would you prefer?
 ```
@@ -68,34 +71,43 @@ Per your human partner's rule "Fix broken things immediately":
 
 **Why critical:** Prevents accidentally committing worktree contents to repository.
 
-### For Global Directory (~/.config/superpowers/worktrees)
+### For External Directory (../<project-name>.worktrees)
 
-No .gitignore verification needed - outside project entirely.
+No .gitignore verification needed - directory lives outside the repository tree.
 
 ## Creation Steps
 
-### 1. Detect Project Name
+### 1. Detect Project Context
 
 ```bash
-project=$(basename "$(git rev-parse --show-toplevel)")
+root=$(git rev-parse --show-toplevel)
+project=$(basename "$root")
+external_dir="$(dirname "$root")/${project}.worktrees"
 ```
 
 ### 2. Create Worktree
 
+Set `LOCATION` to the directory selected earlier (`.worktrees`, `worktrees`, or `../${project}.worktrees`).
+
 ```bash
-# Determine full path
-case $LOCATION in
+# Determine base directory from selection
+case "$LOCATION" in
   .worktrees|worktrees)
-    path="$LOCATION/$BRANCH_NAME"
+    base_dir="$root/$LOCATION"
     ;;
-  ~/.config/superpowers/worktrees/*)
-    path="~/.config/superpowers/worktrees/$project/$BRANCH_NAME"
+  "$external_dir"|../*.worktrees)
+    base_dir="$external_dir"
+    ;;
+  *)
+    base_dir="$LOCATION"
     ;;
 esac
 
+mkdir -p "$base_dir"
+
 # Create worktree with new branch
-git worktree add "$path" -b "$BRANCH_NAME"
-cd "$path"
+git worktree add "$base_dir/$BRANCH_NAME" -b "$BRANCH_NAME"
+cd "$base_dir/$BRANCH_NAME"
 ```
 
 ### 3. Run Project Setup
@@ -147,7 +159,8 @@ Ready to implement <feature-name>
 |-----------|--------|
 | `.worktrees/` exists | Use it (verify .gitignore) |
 | `worktrees/` exists | Use it (verify .gitignore) |
-| Both exist | Use `.worktrees/` |
+| `../<project-name>.worktrees/` exists | Use it when project-local directories are missing (no .gitignore check) |
+| Multiple options exist | Follow priority: `.worktrees` > `worktrees` > external |
 | Neither exists | Check AGENTS.md → Ask user |
 | Directory not in .gitignore | Add it immediately + commit |
 | Tests fail during baseline | Report failures + ask |

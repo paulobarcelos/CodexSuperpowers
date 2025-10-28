@@ -15,27 +15,33 @@ Guide completion of development work by presenting clear options and handling ch
 
 ## The Process
 
-### Step 1: Verify Tests
+### Step 1: Verify Automated Checks
 
-**Before presenting options, verify tests pass:**
+**Before presenting options, run every automated check that protects the branch (lint → tests → build). Treat linting and build commands as part of the test gate.**
 
 ```bash
-# Run project's test suite
+# Lint if defined for the project
+npm run lint / yarn lint / flake8 . / golangci-lint run / golint ./...
+
+# Execute the test suite
 npm test / cargo test / pytest / go test ./...
+
+# Build or package step if the project requires one
+npm run build / cargo build / go build ./...
 ```
 
-**If tests fail:**
+**If any check fails:**
 ```
-Tests failing (<N> failures). Must fix before completing:
+Automated checks failing (<summary>). Must fix before completing:
 
 [Show failures]
 
-Cannot proceed with merge/PR until tests pass.
+Cannot proceed with merge/PR until every check passes.
 ```
 
 Stop. Don't proceed to Step 2.
 
-**If tests pass:** Continue to Step 2.
+**If every check passes:** Continue to Step 2.
 
 ### Step 2: Determine Base Branch
 
