@@ -29,10 +29,11 @@ description: Use when coordinating day-to-day work on Runway Compass — defines
 
 ## Working Agreement
 1. Ensure an Issue exists for the task (create if missing)
-2. Move to In Progress on the Project board
+2. Move to Now on the Project board
 3. Update docs only when system/process actually changes
 4. On completion: tests green → PR → merge → close Issue
+5. Move to Done on the Project board
 
 ## Tools
 - `gh` CLI for Issues/PRs/Projects/Discussions/Wiki
-- Pair with superpowers:github-program-manager (now Wiki-first) and superpowers:tmux-orchestration for parallel agents
+- Pair with superpowers:github-program-manager and superpowers:tmux-orchestration for parallel agents

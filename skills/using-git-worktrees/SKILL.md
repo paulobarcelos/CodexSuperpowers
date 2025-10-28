@@ -110,7 +110,24 @@ git worktree add "$base_dir/$BRANCH_NAME" -b "$BRANCH_NAME"
 cd "$base_dir/$BRANCH_NAME"
 ```
 
-### 3. Run Project Setup
+### 3. Sync Ignored Environment Files
+
+**Git-ignored files (for example `.env`, `.env.local`, local certificates) will not appear in the new worktree. Ask your human partner which ignored files are required before you continue.**
+
+```bash
+# Example: copy common env files when they exist
+for file in .env .env.local .env.development; do
+  if [ -f "$root/$file" ] && [ ! -f "$base_dir/$BRANCH_NAME/$file" ]; then
+    cp "$root/$file" "$base_dir/$BRANCH_NAME/$file"
+  fi
+done
+
+# Prompt for other ignored assets that must be copied
+```
+
+Confirm copies succeeded (correct size, expected permissions) and note what you copied in your handoff.
+
+### 4. Run Project Setup
 
 Auto-detect and run appropriate setup:
 
@@ -129,7 +146,7 @@ if [ -f pyproject.toml ]; then poetry install; fi
 if [ -f go.mod ]; then go mod download; fi
 ```
 
-### 4. Verify Clean Baseline
+### 5. Verify Clean Baseline
 
 Run tests to ensure worktree starts clean:
 
@@ -145,7 +162,7 @@ go test ./...
 
 **If tests pass:** Report ready.
 
-### 5. Report Location
+### 6. Report Location
 
 ```
 Worktree ready at <full-path>
@@ -160,6 +177,7 @@ Ready to implement <feature-name>
 | `.worktrees/` exists | Use it (verify .gitignore) |
 | `worktrees/` exists | Use it (verify .gitignore) |
 | `../<project-name>.worktrees/` exists | Use it when project-local directories are missing (no .gitignore check) |
+| Worktree missing env/ignored files | Ask which files to copy, then bring them over manually |
 | Multiple options exist | Follow priority: `.worktrees` > `worktrees` > external |
 | Neither exists | Check AGENTS.md → Ask user |
 | Directory not in .gitignore | Add it immediately + commit |
@@ -175,6 +193,10 @@ Ready to implement <feature-name>
 **Assuming directory location**
 - **Problem:** Creates inconsistency, violates project conventions
 - **Fix:** Follow priority: existing > AGENTS.md > ask
+
+**Forgetting ignored environment files**
+- **Problem:** Worktree lacks required secrets/config so setup and tests fail mysteriously
+- **Fix:** Prompt for required ignored files (.env variants, certs, caches) and copy them right after creating the worktree
 
 **Proceeding with failing tests**
 - **Problem:** Can't distinguish new bugs from pre-existing issues
