@@ -43,39 +43,22 @@ Tell Codex explicitly: "Create a plan with a checkbox for each task below, then 
 
 ### 2. Execute Task with Subagent
 
-For each task, spin a fresh worker using tmux (one session per task) so context and logs remain isolated. Run the Quick Start block in superpowers:tmux-orchestration once per repository to initialize `.tmux-logs/` and ignore rules before dispatching the first subagent.
+For each task, spin a fresh worker using tmux (one session per task) so context and logs remain isolated.
 
 **REQUIRED SUB-SKILL:** Use superpowers:tmux-orchestration
 
-```bash
-# Example: implement Task N using a dedicated session
-mkdir -p .tmux-logs
-touch .tmux-logs/.gitkeep
-SESSION=task-N-implement
-CMD="codex --yolo 'Implement Task N: <task name>'"
-tmux new-session -d -s "$SESSION"
-tmux send-keys -t "$SESSION" "$CMD" C-m
-tmux pipe-pane -o -t "$SESSION" "ts | tee -a .tmux-logs/${SESSION}.log"
-
-# Send follow-ups to the running worker (if interactive)
-tmux send-keys -t "$SESSION" "Run the failing tests only" C-m
-```
+Implementation flow per task:
+1. Run the Quick Start block in superpowers:tmux-orchestration once per repository (initializes `.tmux-logs/` and ignore rules).
+2. Create a session named after the task (`task-<n>-<slug>`).
+3. Send the subagent command (typically `codex --yolo "Implement Task <n>: <summary>"`).
+4. Pipe the pane to `.tmux-logs/<session>.log` per tmux-orchestration.
+5. Send follow-up instructions via `tmux send-keys` when needed.
 
 The worker (you or another Codex session) follows the task’s instructions, writes tests (TDD), implements the change, verifies, and reports back. Keep the session’s log as the subagent report.
 
 ### 3. Review Subagent's Work
 
-Run a review using the template in `skills/requesting-code-review/code-reviewer.md`. You can do this in the current session or launch a dedicated tmux session for an isolated reviewer (see superpowers:tmux-orchestration).
-
-```bash
-BASE_SHA=$(git rev-parse HEAD~1)   # or your baseline
-HEAD_SHA=$(git rev-parse HEAD)
-SESSION=review-task-N
-REVIEW_CMD="codex --yolo 'Use code-reviewer template with WHAT_WAS_IMPLEMENTED=[summary], PLAN_OR_REQUIREMENTS=Task N from [plan-file], BASE_SHA=$BASE_SHA, HEAD_SHA=$HEAD_SHA, DESCRIPTION=[summary]'"
-tmux new-session -d -s "$SESSION"
-tmux send-keys -t "$SESSION" "$REVIEW_CMD" C-m
-tmux pipe-pane -o -t "$SESSION" "ts | tee -a .tmux-logs/${SESSION}.log"
-```
+Run a review using the template in `skills/requesting-code-review/code-reviewer.md`. Launch the reviewer in its own tmux session via superpowers:tmux-orchestration (session name `review-<task>`, log to `.tmux-logs/`).
 
 Reviewer returns Strengths, Issues (Critical/Important/Minor), and an Assessment. Capture the output in the log and paste highlights back into the main plan.
 
