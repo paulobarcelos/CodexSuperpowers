@@ -65,35 +65,13 @@ Each agent gets:
 
 **REQUIRED SUB-SKILL:** Use superpowers:tmux-orchestration
 
-Use one tmux session per independent domain. Name sessions predictably and pipe logs so you can watch progress without attaching.
+Process (delegated to tmux-orchestration for commands):
+- Launch one orchestration session per independent domain; do not reuse sessions across domains.
+- Name sessions predictably (e.g., `agent-<domain>`), and enable logging before sending any instructions.
+- Dispatch focused work to each agent (e.g., a narrowed test file, a repro script, or a Codex prompt) and keep instructions scoped to the domain goal.
+- Monitor progress via the orchestration logs/dashboard; intervene on stalls, and record notable findings for integration.
 
-```bash
-# Example: three independent investigations
-mkdir -p logs
-
-# Agent 1: abort logic tests
-SESSION=agent-abort-tests
-CMD="npm test -- agent-tool-abort.test.ts"   # or: codex --yolo "Fix agent-tool-abort.test.ts failures"
-tmux new-session -d -s "$SESSION" "$CMD"
-tmux pipe-pane -o -t "$SESSION" "ts | tee -a logs/${SESSION}.log"
-
-# Agent 2: batch completion behavior
-SESSION=agent-batch-completion
-CMD="npm test -- batch-completion-behavior.test.ts"
-tmux new-session -d -s "$SESSION" "$CMD"
-tmux pipe-pane -o -t "$SESSION" "ts | tee -a logs/${SESSION}.log"
-
-# Agent 3: race conditions
-SESSION=agent-race-conditions
-CMD="npm test -- tool-approval-race-conditions.test.ts"
-tmux new-session -d -s "$SESSION" "$CMD"
-tmux pipe-pane -o -t "$SESSION" "ts | tee -a logs/${SESSION}.log"
-
-# Observe all logs together
-tail -n 50 -F logs/*.log | sed -u 's/^/[log] /'
-```
-
-Replace the `CMD` with whatever process best fits the agent: a focused test run, a reproduction script, or a separate Codex instance prompt. See superpowers:tmux-orchestration for details.
+Note: The exact commands to create sessions, stream logs, and follow up are defined in superpowers:tmux-orchestration.
 
 ### 4. Review and Integrate
 
