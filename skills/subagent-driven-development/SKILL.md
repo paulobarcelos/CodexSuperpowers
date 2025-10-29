@@ -47,18 +47,17 @@ For each task, spin a fresh worker using tmux (one session per task) so context 
 
 **REQUIRED SUB-SKILL:** Use superpowers:tmux-orchestration
 
-Implementation flow per task:
-1. Run the Quick Start block in superpowers:tmux-orchestration once per repository (initializes `.tmux-logs/` and ignore rules).
-2. Create a session named after the task (`task-<n>-<slug>`).
-3. Send the subagent command (typically `codex --yolo "Implement Task <n>: <summary>"`).
-4. Pipe the pane to `.tmux-logs/<session>.log` per tmux-orchestration.
-5. Send follow-up instructions via `tmux send-keys` when needed.
+Implementation flow per task (delegated to superpowers:tmux-orchestration):
+1. Run the Quick Start block once per repository to set `LOG_ROOT=$(pwd)/.tmux-logs`, add ignore rules, and keep `.tmux-logs/.gitkeep`.
+2. Choose a session name (`task-<n>-<slug>`) and launch it with `tmux new-session -d -s "$SESSION" -c "$(pwd)"`.
+3. Immediately enable logging with `tmux pipe-pane -o -t "$SESSION:0.0" "ts | tee -a ${LOG_ROOT}/${SESSION}.log"` (absolute path avoids writes to `$HOME`).
+4. Send the subagent command (`codex --yolo "Implement Task <n>: <summary>"`) and any follow-ups using `tmux send-keys`.
 
 The worker (you or another Codex session) follows the task’s instructions, writes tests (TDD), implements the change, verifies, and reports back. Keep the session’s log as the subagent report.
 
 ### 3. Review Subagent's Work
 
-Run a review using the template in `skills/requesting-code-review/code-reviewer.md`. Launch the reviewer in its own tmux session via superpowers:tmux-orchestration (session name `review-<task>`, log to `.tmux-logs/`).
+Run a review using the template in `skills/requesting-code-review/code-reviewer.md`. Launch the reviewer in its own tmux session via superpowers:tmux-orchestration (session name `review-<task>`, same `LOG_ROOT` logging pattern as above).
 
 Reviewer returns Strengths, Issues (Critical/Important/Minor), and an Assessment. Capture the output in the log and paste highlights back into the main plan.
 
