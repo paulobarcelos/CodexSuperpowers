@@ -15,7 +15,16 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 
-**Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>.md`
+## Plan Placement (Colocation)
+
+Place the plan where the work lives to keep context and history together:
+
+- If the project is tracked in GitHub and the plan aligns with a specific Issue: put the plan in that Issue (edit description or add a top-level comment). Link any related PRs/Projects. 
+- If the plan concerns the process of finishing/closing a PR (beyond a single Issue): put the plan in that PR (edit description or add a comment) so reviewers see it in context.
+- If the plan is local/exploratory or not tied to an Issue/PR: save to `docs/plans/YYYY-MM-DD-<feature-name>.md` in the repo.
+- If uncertain where to place it, ask your human partner which location they prefer.
+
+REQUIRED SUB-SKILL: Use superpowers:github-program-manager for creating/updating Issues/PRs and cross-linking via `gh`.
 
 ## Bite-Sized Task Granularity
 
@@ -96,9 +105,9 @@ git commit -m "feat: add specific feature"
 
 ## Execution Handoff
 
-After saving the plan, offer execution choice:
+After saving the plan (in the chosen Issue, PR, or local file), offer execution choice:
 
-**"Plan complete and saved to `docs/plans/<filename>.md`. Two execution options:**
+**"Plan complete and saved to <location>. Two execution options:**
 
 **1. Subagent-Driven (this session)** - I dispatch fresh subagent per task, review between tasks, fast iteration
 
