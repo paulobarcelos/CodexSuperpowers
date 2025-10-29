@@ -48,8 +48,8 @@ For each task, spin a fresh worker using tmux (one session per task) so context 
 **REQUIRED SUB-SKILL:** Use superpowers:tmux-orchestration
 
 Implementation flow per task (delegated to superpowers:tmux-orchestration):
-1. Before the first subagent, run the tmux-orchestration Quick Start so `.tmux-logs/` exists, is gitignored, and logging paths are absolute.
-2. For each task, pick a descriptive session name (`task-<n>-<slug>`) and launch a fresh tmux session using the orchestration skill, enabling logging immediately so output streams into `.tmux-logs/<session>.log`.
+1. Before the first subagent, run the tmux-orchestration Quick Start so the logging directory exists, is gitignored, and absolute paths are configured.
+2. For each task, pick a descriptive session name (`task-<n>-<slug>`) and launch a fresh tmux session using the orchestration skill, enabling logging immediately so output streams into that session’s dedicated log file.
 3. Dispatch the subagent command for the task (typically a `codex --yolo ...` invocation) and drive the task through follow-up instructions, capturing decisions in the log.
 4. Monitor the session log (tail or tmux attach) so you can intervene quickly and later paste highlights back into the plan.
 
