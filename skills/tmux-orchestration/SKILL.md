@@ -54,13 +54,13 @@ SESSION=agent-grid
 PROMPT="Execute Task 3 from docs/plans/2025-10-26-grid.md"
 LOG_ROOT="$(pwd)/.tmux-logs"
 tmux new-session -d -s "$SESSION" -c "$(pwd)"
+tmux pipe-pane -o -t "$SESSION:0.0" "ts | tee -a ${LOG_ROOT}/${SESSION}.log"
 tmux send-keys -t "$SESSION" "cd /path/to/location"
 tmux send-keys -t "$SESSION" Enter
 tmux send-keys -t "$SESSION" "codex --yolo"
 tmux send-keys -t "$SESSION" Enter
 tmux send-keys -t "$SESSION" "'$PROMPT'"
 tmux send-keys -t "$SESSION" C-m
-tmux pipe-pane -o -t "$SESSION:0.0" "ts | tee -a ${LOG_ROOT}/${SESSION}.log"
 ```
 
 ### Send follow-ups (canonical two commands)

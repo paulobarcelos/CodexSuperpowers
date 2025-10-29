@@ -48,16 +48,16 @@ For each task, spin a fresh worker using tmux (one session per task) so context 
 **REQUIRED SUB-SKILL:** Use superpowers:tmux-orchestration
 
 Implementation flow per task (delegated to superpowers:tmux-orchestration):
-1. Run the Quick Start block once per repository to set `LOG_ROOT=$(pwd)/.tmux-logs`, add ignore rules, and keep `.tmux-logs/.gitkeep`.
-2. Choose a session name (`task-<n>-<slug>`) and launch it with `tmux new-session -d -s "$SESSION" -c "$(pwd)"`.
-3. Immediately enable logging with `tmux pipe-pane -o -t "$SESSION:0.0" "ts | tee -a ${LOG_ROOT}/${SESSION}.log"` (absolute path avoids writes to `$HOME`).
-4. Send the subagent command (`codex --yolo "Implement Task <n>: <summary>"`) and any follow-ups using `tmux send-keys`.
+1. Before the first subagent, run the tmux-orchestration Quick Start so `.tmux-logs/` exists, is gitignored, and logging paths are absolute.
+2. For each task, pick a descriptive session name (`task-<n>-<slug>`) and launch a fresh tmux session using the orchestration skill, enabling logging immediately so output streams into `.tmux-logs/<session>.log`.
+3. Dispatch the subagent command for the task (typically a `codex --yolo ...` invocation) and drive the task through follow-up instructions, capturing decisions in the log.
+4. Monitor the session log (tail or tmux attach) so you can intervene quickly and later paste highlights back into the plan.
 
 The worker (you or another Codex session) follows the task’s instructions, writes tests (TDD), implements the change, verifies, and reports back. Keep the session’s log as the subagent report.
 
 ### 3. Review Subagent's Work
 
-Run a review using the template in `skills/requesting-code-review/code-reviewer.md`. Launch the reviewer in its own tmux session via superpowers:tmux-orchestration (session name `review-<task>`, same `LOG_ROOT` logging pattern as above).
+Run a review using the template in `skills/requesting-code-review/code-reviewer.md`. Launch the reviewer in its own tmux session via superpowers:tmux-orchestration (session name `review-<task>`, same logging routine as implementation sessions).
 
 Reviewer returns Strengths, Issues (Critical/Important/Minor), and an Assessment. Capture the output in the log and paste highlights back into the main plan.
 
