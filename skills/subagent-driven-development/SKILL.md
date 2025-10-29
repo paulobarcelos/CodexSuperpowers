@@ -43,21 +43,22 @@ Tell Codex explicitly: "Create a plan with a checkbox for each task below, then 
 
 ### 2. Execute Task with Subagent
 
-For each task, spin a fresh worker using tmux (one session per task) so context and logs remain isolated.
+For each task, dispatch a fresh subagent via the orchestration skill so context and logs stay isolated (one orchestration session per task).
 
 **REQUIRED SUB-SKILL:** Use superpowers:tmux-orchestration
 
-Implementation flow per task (delegated to superpowers:tmux-orchestration):
-1. Before the first subagent, run the tmux-orchestration Quick Start so the logging directory exists, is gitignored, and absolute paths are configured.
-2. For each task, pick a descriptive session name (`task-<n>-<slug>`) and launch a fresh tmux session using the orchestration skill, enabling logging immediately so output streams into that session’s dedicated log file.
-3. Dispatch the subagent command for the task (typically a `codex --yolo ...` invocation) and drive the task through follow-up instructions, capturing decisions in the log.
-4. Monitor the session log (tail or tmux attach) so you can intervene quickly and later paste highlights back into the plan.
+Implementation flow per task (process only; see tmux-orchestration for commands):
+1. Initialize orchestration once if needed (per its Quick Start).
+2. Create a uniquely named session for the task (`task-<n>-<slug>`); do not reuse sessions across tasks.
+3. Ensure logging is active from the start of the session; do not proceed without it.
+4. Send clear, scoped instructions to the subagent: goal, acceptance criteria, constraints, and timebox.
+5. Monitor the run through the orchestration logs/dashboard; intervene if stuck, escalate if blocked, and record notable decisions.
 
 The worker (you or another Codex session) follows the task’s instructions, writes tests (TDD), implements the change, verifies, and reports back. Keep the session’s log as the subagent report.
 
 ### 3. Review Subagent's Work
 
-Run a review using the template in `skills/requesting-code-review/code-reviewer.md`. Launch the reviewer in its own tmux session via superpowers:tmux-orchestration (session name `review-<task>`, same logging routine as implementation sessions).
+Run a review using the template in `skills/requesting-code-review/code-reviewer.md`. Launch the reviewer in its own orchestration session (e.g., `review-<task>`), with logging enabled, using superpowers:tmux-orchestration.
 
 Reviewer returns Strengths, Issues (Critical/Important/Minor), and an Assessment. Capture the output in the log and paste highlights back into the main plan.
 
