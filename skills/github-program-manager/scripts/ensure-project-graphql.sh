@@ -46,7 +46,7 @@ have_field(){ echo "$FIELDS" | jq -e --arg NAME "$1" '.data.node.fields.nodes[] 
 
 if ! have_field Status; then
   echo "Creating Status field"
-  gh api graphql -f query='mutation($pid:ID!){ createProjectV2Field(input:{ projectId:$pid, name:"Status", dataType:SINGLE_SELECT, singleSelectOptions:[{name:"Backlog",description:"Backlog",color:GRAY},{name:"Selected",description:"Selected",color:BLUE},{name:"In Progress",description:"In Progress",color:YELLOW},{name:"Review",description:"Review",color:ORANGE},{name:"Done",description:"Done",color:GREEN}]}){ projectV2Field{ __typename } }}' -F pid="$PROJ_ID" >/dev/null
+  gh api graphql -f query='mutation($pid:ID!){ createProjectV2Field(input:{ projectId:$pid, name:"Status", dataType:SINGLE_SELECT, singleSelectOptions:[{name:"Backlog",description:"Planned, not started.",color:GRAY},{name:"In Progress",description:"Actively being worked.",color:YELLOW},{name:"In Review",description:"Awaiting review/QA.",color:ORANGE},{name:"Done",description:"Merged/closed; work complete.",color:GREEN}]}){ projectV2Field{ __typename } }}' -F pid="$PROJ_ID" >/dev/null
 fi
 
 if ! have_field Priority; then

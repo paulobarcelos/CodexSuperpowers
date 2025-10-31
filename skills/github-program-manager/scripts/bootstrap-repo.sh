@@ -65,7 +65,7 @@ if [[ -z "$PROJ_NUM" || "$PROJ_NUM" == null ]]; then
 fi
 
 echo "==> Ensure standard fields on Project $PROJ_NUM"
-gh project field-create --owner "$OWNER" --number "$PROJ_NUM" --name "Status" --data-type SINGLE_SELECT --options "Backlog,Selected,In Progress,Review,Done" 2>/dev/null || true
+gh project field-create --owner "$OWNER" --number "$PROJ_NUM" --name "Status" --data-type SINGLE_SELECT --options "Backlog,In Progress,In Review,Done" 2>/dev/null || true
 gh project field-create --owner "$OWNER" --number "$PROJ_NUM" --name "Priority" --data-type SINGLE_SELECT --options "High,Medium,Low" 2>/dev/null || true
 gh project field-create --owner "$OWNER" --number "$PROJ_NUM" --name "Size" --data-type NUMBER 2>/dev/null || true
 gh project field-create --owner "$OWNER" --number "$PROJ_NUM" --name "Iteration" --data-type ITERATION --iteration-duration 14 2>/dev/null || true

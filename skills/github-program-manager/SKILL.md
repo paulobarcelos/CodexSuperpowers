@@ -27,6 +27,11 @@ Run project management entirely in GitHub using `gh` and the API. Source of trut
 - Release: tag, generate notes, close milestone, announce.
 
 ## Quick Reference
+- Status definitions (Project v2):
+  - Backlog: Planned, not started.
+  - In Progress: Actively being worked.
+  - In Review: Awaiting review/QA.
+  - Done: Merged/closed; work complete.
 - Wiki enable: `gh repo edit <owner>/<repo> --enable-wiki`
 - Seed Wiki pages: `OWNER=<o> REPO=<r> bash scripts/wiki-ensure-pages.sh`
 - Wiki append (Journal): `OWNER=<o> REPO=<r> PAGE=Journal TITLE="<topic>" BODY_FILE=<file> bash scripts/wiki-append-entry.sh`

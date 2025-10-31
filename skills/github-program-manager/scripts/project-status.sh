@@ -31,7 +31,7 @@ if [[ -z "$OPTION_ID" || "$OPTION_ID" == null ]]; then
         OPTION_ID=$(echo "$FIELDS" | jq -r ".data.node.fields.nodes[] | select(.name==\"Status\") | .options[] | select(.name==\"$alt\") | .id"); [[ -n "$OPTION_ID" && "$OPTION_ID" != null ]] && break; done;;
     "In Progress") for alt in "In Progress" "In progress"; do 
         OPTION_ID=$(echo "$FIELDS" | jq -r ".data.node.fields.nodes[] | select(.name==\"Status\") | .options[] | select(.name==\"$alt\") | .id"); [[ -n "$OPTION_ID" && "$OPTION_ID" != null ]] && break; done;;
-    "Review") for alt in "Review" "In review" "In Review"; do 
+    "In Review") for alt in "In Review" "In review" "Review"; do 
         OPTION_ID=$(echo "$FIELDS" | jq -r ".data.node.fields.nodes[] | select(.name==\"Status\") | .options[] | select(.name==\"$alt\") | .id"); [[ -n "$OPTION_ID" && "$OPTION_ID" != null ]] && break; done;;
     "Done") for alt in "Done" "Closed"; do 
         OPTION_ID=$(echo "$FIELDS" | jq -r ".data.node.fields.nodes[] | select(.name==\"Status\") | .options[] | select(.name==\"$alt\") | .id"); [[ -n "$OPTION_ID" && "$OPTION_ID" != null ]] && break; done;;
@@ -48,4 +48,3 @@ fi
 # GraphQL mutation to update item field value
 gh api graphql -f query='mutation($proj:ID!,$item:ID!,$field:ID!,$opt:String!){ updateProjectV2ItemFieldValue(input:{projectId:$proj,itemId:$item,fieldId:$field,value:{ singleSelectOptionId:$opt }}){ projectV2Item{ id } }}' -F proj="$PROJ_ID" -F item="$ITEM_ID" -F field="$STATUS_FIELD_ID" -F opt="$OPTION_ID" >/dev/null
 echo "Updated item $ITEM_ID to Status=$STATUS"
-
