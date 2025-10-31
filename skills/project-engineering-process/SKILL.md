@@ -10,7 +10,7 @@ description: Use when coordinating day-to-day work on Runway Compass — defines
 - Discussions → Ideas (category)
 - Issues → Executable work with acceptance criteria
 - PRs → Code changes linked to Issues
-- Projects v2 → Planning and status (Backlog/Now/Next/Done)
+- Projects v2 → Planning and status (Backlog/In Progress/In Review/Done)
 - Milestones/Releases → Cadence and notes
 
 ## Branching & Commits
@@ -29,10 +29,10 @@ description: Use when coordinating day-to-day work on Runway Compass — defines
 
 ## Working Agreement
 1. Ensure an Issue exists for the task (create if missing)
-2. Move to Now on the Project board
+2. Move the Issue to In Progress on the Project board
 3. Update docs only when system/process actually changes
-4. On completion: tests green → PR → merge → close Issue
-5. Move to Done on the Project board
+4. When a PR is opened for the Issue, move the Issue to In Review
+5. After merge: close Issue and move it to Done on the Project board
 
 ## Tools
 - `gh` CLI for Issues/PRs/Projects/Discussions/Wiki

@@ -19,10 +19,10 @@ Run project management entirely in GitHub using `gh` and the API. Source of trut
 - Keep artifacts repo‑local; avoid stray `.md` notes.
 
 ## Rituals (Lean)
-- Bootstrap (once): labels, Wiki enabled and seeded with Journal.md and Decisions.md, Discussions enabled with category (Ideas), Issue forms (bug/feature), branch protection, Projects v2 board with Status/Priority/Size.
+- Bootstrap (once): labels, Wiki enabled and seeded with Journal.md and Decisions.md, Discussions enabled with category (Ideas), Issue forms (bug/feature), branch protection, Projects v2 board with Status/Priority/Size (Status cadence: Backlog → In Progress → In Review → Done).
 - Intake: use Wiki for journal/decisions; Discussions for ideas; Issues for executable work. Label, size, and add Issues to Project (Status=Backlog).
-- Plan: pick scope by Milestone; save views (Backlog/Now/Next).
-- Execute: draft PRs early; “Closes #<id>”; update Status when PR opens/merges.
+- Plan: pick scope by Milestone; save views (Backlog/In Progress/In Review/Done).
+- Execute: draft PRs early; “Closes #<id>”; update Status when PR opens/merges (In Progress → In Review on PR open; Done on merge).
 - Review: checks green; at least one review.
 - Release: tag, generate notes, close milestone, announce.
 
@@ -48,7 +48,7 @@ Run project management entirely in GitHub using `gh` and the API. Source of trut
 3) Append Journal and Decision sample entries via `wiki-append-entry.sh`.
 4) Ensure Discussions has an Ideas category only: `OWNER=<owner> REPO=<repo> bash scripts/ensure-discussion-categories.sh`
 5) Issue → add to Project → Status="In Progress" using `scripts/project-status.sh`.
-6) Draft PR with “Closes #<id>”; optionally merge and set Status="Done".
+6) Draft PR with “Closes #<id>”; set Status="In Review"; on merge set Status="Done".
 
 ## Acceptance Criteria
 - All core actions work via CLI/API only.
